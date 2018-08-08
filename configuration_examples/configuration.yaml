@@ -1,0 +1,5 @@
+repositories:
+  git@github.com:twbs/bootstrap.git:
+      branch: master
+  git@github.com:nodejs/node.git:
+      branch: master
