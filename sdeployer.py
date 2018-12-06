@@ -1,4 +1,5 @@
 import os
+import signal
 
 import click
 import yaml
@@ -7,14 +8,17 @@ from click import Context
 from deployer import Deployer
 from utils import yaml_is_valid
 
+deployer = None
+
 
 @click.group()
 @click.option(
     "--configuration",
     help="Path to a configuration file if defined, else use environment variable's SERVERLESS_DEPLOYER_CONF value",
 )
+@click.option("--verbose", "verbose", help="Add verbose printing", default=False, type=bool, is_flag=True)
 @click.pass_context
-def cli(ctx: Context, configuration: str):
+def cli(ctx: Context, configuration: str, verbose: bool):
     value = configuration if configuration else os.environ.get("SERVERLESS_DEPLOYER_CONF")
     if not value:
         click.echo(
@@ -35,21 +39,43 @@ def cli(ctx: Context, configuration: str):
     with open(value) as file:
         config = yaml.safe_load(file)
         ctx.obj["CONFIGURATION"] = config
+        ctx.obj["VERBOSE"] = verbose
 
 
-@cli.command(help="Checks if you have the latest version of functions installed in your environment")
+@cli.command(
+    help="Pull remote changes,  update repositories to the latest commits and deploy them", name="pull-and-deploy"
+)
 @click.pass_context
-def status(ctx: Context):
+def pull_and_deploy(ctx: Context):
+    global deployer
     deployer = Deployer(ctx)
-    deployer.status()
+    deployer.pull_and_update()
 
 
-@cli.command(help="Pull remote changes and update repositories to the latest commits")
+@cli.command(help="Undeploy any existing services")
+@click.pass_context
+def remove(ctx: Context):
+    global deployer
+    deployer = Deployer(ctx)
+    deployer.undeploy()
+
+
+@cli.command(help="Pull remote changes,  update repositories to the latest commits")
 @click.pass_context
 def pull(ctx: Context):
+    global deployer
     deployer = Deployer(ctx)
     deployer.pull()
 
 
+def signal_handler(sig, frame):
+    global deployer
+    click.echo(click.style("Ctrl+C presses, stopping all running processes...", fg="red"), err=True)
+    if deployer:
+        deployer.stop()
+    exit(1)
+
+
 if __name__ == "__main__":
+    signal.signal(signal.SIGINT, signal_handler)
     cli(obj={})
