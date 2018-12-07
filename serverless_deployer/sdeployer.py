@@ -5,8 +5,8 @@ import click
 import yaml
 from click import Context
 
-from .deployer import Deployer
-from .utils import yaml_is_valid
+from serverless_deployer.deployer import Deployer
+from serverless_deployer.utils import yaml_is_valid
 
 deployer = None
 
@@ -38,15 +38,18 @@ def cli(ctx: Context, configuration: str, verbose: bool):
         exit(1)
     with open(value) as file:
         config = yaml.safe_load(file)
-        ctx.obj["CONFIGURATION"] = config
-        ctx.obj["VERBOSE"] = verbose
+        ctx.obj = {"CONFIGURATION": config, "VERBOSE": verbose}
 
 
 @cli.command(
     help="Pull remote changes,  update repositories to the latest commits and deploy them", name="pull-and-deploy"
 )
+@click.option(
+    "--force-deploy", "force_deploy", help="Force deploy all repositories", default=False, type=bool, is_flag=True
+)
 @click.pass_context
-def pull_and_deploy(ctx: Context):
+def pull_and_deploy(ctx: Context, force_deploy: bool):
+    ctx.obj["FORCE"] = force_deploy
     global deployer
     deployer = Deployer(ctx)
     deployer.pull_and_update()
