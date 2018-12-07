@@ -9,7 +9,7 @@ import click
 from click import Context
 import subprocess
 from git import Repo
-from utils import (
+from .utils import (
     nested_get,
     is_same_commit,
     loop_on_valid_repositories,
@@ -88,40 +88,26 @@ class Deployer:
                 raise subprocess.SubprocessError(f"Failed running {command_to_run}. Check {filename} for details")
 
     def _run_action_on_cloud(self, location_on_disk: os.DirEntry, repo_details: dict, deploy: bool = True):
-        # Check if contains deploy command
-        did_run = False
-
         action_label = "deploy_command"
         action_present = "deploy"
         sls_action = "deploy"
-        action_past = "deployed"
         if not deploy:
             action_label = "remove_command"
             action_present = "remove"
             sls_action = "remove"
-            action_past = "removed"
 
         if action_label in repo_details:
             command: str = str(repo_details.get(action_label))
-            if command == "None":
-                click.echo(f"Asked to skip {action_present}")
-                return
-
-            click.echo(f"Found {action_present} command {command}")
-            did_run = True
+            click.echo(f"Found {action_present} command {command}. Executing...")
             self._run_command(command, location_on_disk)
 
         elif os.path.isfile(f"{location_on_disk}/serverless.yml"):
-            click.echo(f"Found serverless.yml using Serverless framework")
+            click.echo(f"Found serverless.yml using Serverless framework. Executing...")
             if which("sls") is None:
                 raise subprocess.SubprocessError("Trying to run 'sls', but 'sls not found in path.")
             self._run_command(f"sls {sls_action}", location_on_disk)
-            did_run = True
-
-        if did_run:
-            click.echo(click.style(f"Successfully {action_past}", fg="green"))
         else:
-            raise subprocess.SubprocessError(f"Did not find any {action_present} command")
+            click.echo(f"Did not find any {action_present}. Skipping {action_present}...")
 
     def _update_to_latest(self) -> Tuple[int, int, dict]:
         latest_count = 0

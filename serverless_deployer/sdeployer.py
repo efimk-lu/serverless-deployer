@@ -5,8 +5,8 @@ import click
 import yaml
 from click import Context
 
-from deployer import Deployer
-from utils import yaml_is_valid
+from .deployer import Deployer
+from .utils import yaml_is_valid
 
 deployer = None
 

@@ -1,5 +1,13 @@
+general:
+  repositories_root_directory: ~/source
 repositories:
-  git@github.com:twbs/bootstrap.git:
-      branch: master
-  git@github.com:nodejs/node.git:
-      branch: master
+  git@github.com:lumigo-io/lumigo-tracer.git:
+    branch: master
+  git@github.com:lumigo-io/lumigo-api.git:
+    deploy_command: ./scripts/deploy.sh
+    remove_command: ./scripts/remove.sh
+    branch: master
+  git@github.com:lumigo-io/integration-tests.git:
+    deploy_command: ./scripts/deploy.sh
+    remove_command: ./scripts/remove.sh
+    branch: master
