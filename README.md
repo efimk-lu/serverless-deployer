@@ -4,7 +4,7 @@
 * On osx run
   * `brew install python`
   * `echo "export PATH=/usr/local/bin:$PATH" >> ~/.bashrc`
-  * Restart yiur terminal
+  * Restart your terminal
 # Sdeployer
 * Execute `pip install --user git+https://github.com/efimk-lu/serverless-deployer.git` to install it globally for the user.
 
