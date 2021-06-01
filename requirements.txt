@@ -17,5 +17,5 @@ PyYAML==3.13
 six==1.11.0
 smmap2==2.0.4
 toml==0.9.4
-urllib3==1.23
+urllib3==1.26.5
 virtualenv==16.0.0
