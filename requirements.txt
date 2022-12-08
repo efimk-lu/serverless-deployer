@@ -3,7 +3,7 @@ aspy.yaml==1.1.1
 attrs==18.1.0
 black==18.6b4
 cached-property==1.4.3
-certifi==2018.4.16
+certifi==2022.12.7
 cfgv==1.1.0
 Click==7.0
 colorama==0.3.9
